@@ -20,7 +20,7 @@ class PredictService {
             result: predictResult.prediction,
             recommendation: predictResult.prediction === 'Anemia' ? anemiaDesc : nonAnemiaDesc
         }
-        await this.firebase.savePrediction(newPrediction);
+        await this._firebase.savePrediction(newPrediction);
         return newPrediction;
     }
 }

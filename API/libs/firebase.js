@@ -18,18 +18,33 @@ class FireBase {
     }
 
     getUid = async () => {
-        // const decodedToken = await admin.auth().verifyIdToken(idToken);
-        // return decodedToken.uid;
-        return 'Q1ShNyf7bJcfKLp8d2yf25jqucH2'; // Testing purposes'
+        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        return decodedToken.uid;
+        // return 'Q1ShNyf7bJcfKLp8d2yf25jqucH3'; // Testing purposes'
     }
 
+    authenticateNewFirebaseUser = async (req, res, next) => {
+        const idToken = req.header('Authorization');
+
+        try {
+            const decodedToken = await admin.auth().verifyIdToken(idToken);
+            req.uid = decodedToken.uid;
+            // req.uid = 'Q1ShNyf7bJcfKLp8d2yf25jqucH2'; // Testing purposes'
+
+            next();
+        } catch (error) {
+            console.error(error);
+            res.status(401).json({ error: 'Unauthorized' });
+        }
+    };
+
     authenticateFirebaseUser = async (req, res, next) => {
-        // const idToken = req.header('Authorization');
+        const idToken = req.header('Authorization');
     
         try {
-            // const decodedToken = await admin.auth().verifyIdToken(idToken);
-            // req.uid = decodedToken.uid;
-            req.uid = 'Q1ShNyf7bJcfKLp8d2yf25jqucH2'; // Testing purposes'
+            const decodedToken = await admin.auth().verifyIdToken(idToken);
+            req.uid = decodedToken.uid;
+            // req.uid = 'Q1ShNyf7bJcfKLp8d2yf25jqucH3'; // Testing purposes'
 
             const isUidExist = await this.isUidExist(req.uid);
 

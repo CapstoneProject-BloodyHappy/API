@@ -5,8 +5,10 @@ require('dotenv').config();
 
 const CloudStorage = require('./libs/cloud-storage');
 const PredictionAPI = require('./libs/prediction-api');
-const PredictController = require('./controller/predict-controller');
 const FireBase = require('./libs/firebase');
+
+const PredictController = require('./controller/predict-controller');
+const ProfileController = require('./controller/profile-controller');
 
 const app = express();
 const port = 3000;
@@ -18,9 +20,37 @@ const fireBase = new FireBase();
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-app.use(fireBase.authenticateFirebaseUser);
+app.use(['/profile', '/predict'], fireBase.authenticateFirebaseUser);
+app.use('/create-user', fireBase.authenticateNewFirebaseUser);
 
 const predictController = new PredictController(cloudStorage, predictionAPI, fireBase);
+const profileController = new ProfileController(fireBase, cloudStorage);
+
+app.post('/create-user', async (req, res) => {
+    try {
+        const uid = await fireBase.getUid();
+        const isUidExist = await fireBase.isUidExist(uid);
+
+        if (isUidExist) {
+            res.status(403).json({ response: 'User Already Exist' });
+        }
+
+        profileController.createProfile(req, res);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+app.get('/profile', async (req, res) => {
+    try {
+        profileController.getProfile(req, res);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
 
 app.post('/predict', upload.single('file'), async (req, res) => {
     try {
