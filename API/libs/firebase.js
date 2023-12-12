@@ -60,42 +60,42 @@ class FireBase {
     };
 
 
-    async savePrediction(prediction) {
+    savePrediction = async (prediction) => {
         const docRef = this._firestore.collection('predictions').doc();
         await docRef.set(prediction);
     }
 
-    async getPredictions() {
+    getPredictions = async () => {
         const snapshot = await this._firestore.collection('predictions').get();
         return snapshot.docs.map(doc => doc.data());
     }
 
-    async getPrediction(id) {
+    getPrediction = async (id) => {
         const snapshot = await this._firestore.collection('predictions').doc(id).get();
         return snapshot.data();
     }
 
-    async getPredictionsByUid(uid) {
+    getPredictionsByUid = async (uid) => {
         const snapshot = await this._firestore.collection('predictions').where('uid', '==', uid).get();
         return snapshot.docs.map(doc => doc.data());
     }
 
-    async deletePrediction(id) {
+    deletePrediction = async (id) => {
         await this._firestore.collection('predictions').doc(id).delete();
     }
 
-    async updateUser(uid, profile) {
+    updateUser = async (uid, profile) => {
         const snapshot = await this._firestore.collection('users').where('uid', '==', uid).get();
         const docId = snapshot.docs[0].id;
         await this._firestore.collection('users').doc(docId).update(profile);
     }
 
-    async getUser(uid) {
+    getUser = async (uid) => {
         const snapshot = await this._firestore.collection('users').where('uid', '==', uid).get();
         return snapshot.docs[0].data();
     }
 
-    async createUser(user) {
+    createUser = async (user) => {
         await this._firestore.collection('users').add(user);
     }
 }

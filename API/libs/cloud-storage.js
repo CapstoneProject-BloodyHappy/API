@@ -10,7 +10,7 @@ class cloudStorage {
         this._bucket = this._storage.bucket(this._bucketName);
     }
 
-    uploadPhoto(file, folder) {
+    uploadPhoto = async (file, folder) => {
         return new Promise((resolve, reject) => {
             const { originalname, buffer } = file;
             const blob = this._bucket.file(`${folder}/${originalname.replace(/ /g, "_")}`);

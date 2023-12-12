@@ -5,7 +5,7 @@ class PredictionAPI {
         this._predictionUrl = predictionUrl;
     }
 
-    getPrediction(photoUrl) {
+    getPrediction = (photoUrl) => {
         return new Promise((resolve, reject) => {
             fetch(this._predictionUrl, {
                     method: 'POST',

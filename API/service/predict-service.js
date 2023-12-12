@@ -10,7 +10,7 @@ class PredictService {
         this._firebase = firebase;
     }
 
-    async predict(req, res) {
+    predict = async (req, res) => {
         let fileUrl = await this._cloudStorage.uploadPhoto(req.file, 'photo');
         let predictResult = await this._predictionAPI.getPrediction(fileUrl);
         let newPrediction = {
@@ -22,6 +22,10 @@ class PredictService {
         }
         await this._firebase.savePrediction(newPrediction);
         return newPrediction;
+    }
+
+    getPredictions = async (req, res) => {
+    
     }
 }
 
