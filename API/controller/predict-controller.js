@@ -1,15 +1,17 @@
 const PredictService = require('../service/predict-service');
 
 class PredictController {
-    constructor(cloudStorage) {
+    constructor(cloudStorage, predictionAPI, firebase) {
         this._cloudStorage = cloudStorage;
-        this._predictService = new PredictService(cloudStorage);
+        this._predictionAPI = predictionAPI;
+        this._firebase = firebase;
+        this._predictService = new PredictService(cloudStorage, predictionAPI, firebase);
     }
 
     async predict(req, res) {
         try {
-            const model = await this._predictService.predict(req, res);
-            res.json({ model });
+            const prediction = await this._predictService.predict(req, res);
+            res.json(prediction);
         } catch (error) {
             console.error(error);
             res.status(500).send('Internal Server Error');
