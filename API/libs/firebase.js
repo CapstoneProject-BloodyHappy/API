@@ -17,19 +17,17 @@ class FireBase {
         return snapshot.docs.length > 0;
     }
 
-    getUid = async () => {
-        const decodedToken = await admin.auth().verifyIdToken(idToken);
-        return decodedToken.uid;
-        // return 'Q1ShNyf7bJcfKLp8d2yf25jqucH3'; // Testing purposes'
+    getUid = async (idToken) => {
+        // const decodedToken = await admin.auth().verifyIdToken(idToken);  // Prod
+        // return decodedToken.uid;                                         // Prod
+        return 'Q1ShNyf7bJcfKLp8d2yf25jqucH3';                              // Test
     }
 
     authenticateNewFirebaseUser = async (req, res, next) => {
         const idToken = req.header('Authorization');
 
         try {
-            const decodedToken = await admin.auth().verifyIdToken(idToken);
-            req.uid = decodedToken.uid;
-            // req.uid = 'Q1ShNyf7bJcfKLp8d2yf25jqucH2'; // Testing purposes'
+            const decodedToken = await this.getUid(idToken);
 
             next();
         } catch (error) {
@@ -42,11 +40,9 @@ class FireBase {
         const idToken = req.header('Authorization');
     
         try {
-            const decodedToken = await admin.auth().verifyIdToken(idToken);
-            req.uid = decodedToken.uid;
-            // req.uid = 'Q1ShNyf7bJcfKLp8d2yf25jqucH3'; // Testing purposes'
+            const decodedToken = await this.getUid(idToken);
 
-            const isUidExist = await this.isUidExist(req.uid);
+            const isUidExist = await this.isUidExist(decodedToken);
 
             if (!isUidExist) {
                 res.status(403).json({ response: 'New User Login, Initialize User First' });
@@ -59,15 +55,54 @@ class FireBase {
         }
     };
 
+    authenticateFirebaseUserForSocket = async (socket, next) => {
+        const idToken = socket.request.headers['Authorization'];
+    
+        try {
+            const decodedToken = await this.getUid(idToken);
+
+            const isUidExist = await this.isUidExist(decodedToken);
+
+            if (!isUidExist) {
+                next(new Error('New User Login, Initialize User First'));
+            }
+
+            next();
+        } catch (error) {
+            console.error(error);
+            next(new Error('Unauthorized'));
+        }
+    };
+
 
     savePrediction = async (prediction) => {
-        const docRef = this._firestore.collection('predictions').doc();
-        await docRef.set(prediction);
+        try {
+            const docRef = this._firestore.collection('predictions').doc();
+            await docRef.set(prediction);
+        }
+        catch (error) {
+            console.error(error);
+            throw {
+                status: 500,
+                message: 'Failed to save prediction',
+                log: error
+            }
+        }
     }
 
     getPredictions = async () => {
-        const snapshot = await this._firestore.collection('predictions').get();
-        return snapshot.docs.map(doc => doc.data());
+        try{
+            const snapshot = await this._firestore.collection('predictions').get();
+            return snapshot.docs.map(doc => doc.data());
+        }
+        catch(error){
+            console.error(error);
+            throw {
+                status: 500,
+                message: 'Failed to get predictions',
+                log: error
+            }
+        }
     }
 
     getPrediction = async (id) => {
@@ -96,7 +131,41 @@ class FireBase {
     }
 
     createUser = async (user) => {
-        await this._firestore.collection('users').add(user);
+        try {
+            await this._firestore.collection('users').add(user);
+        }
+        catch (error) {
+            console.error(error);
+            throw {
+                status: 500,
+                message: 'Failed to create user',
+                log: error
+            }
+        }
+    }
+
+    isConsultationExist = async (clientUid, doctorUid) => {
+        const snapshot = await this._firestore.collection('consultations').where('clintUid', '==', clientUid).where('doctorUid', '==', doctorUid).get();
+        return snapshot.docs.length > 0;
+    }
+
+    createConsultation = async (doctorUid, clientUid, predictionid) => {
+        try {
+            const consultation = {
+                doctorUid,
+                clientUid,
+                predictionid
+            };
+            await this._firestore.collection('consultations').add(consultation);
+        }
+        catch (error) {
+            console.error(error);
+            throw {
+                status: 500,
+                message: 'Failed to create consultation',
+                log: error
+            }
+        }
     }
 }
 

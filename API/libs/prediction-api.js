@@ -6,24 +6,33 @@ class PredictionAPI {
     }
 
     getPrediction = (photoUrl) => {
-        return new Promise((resolve, reject) => {
-            fetch(this._predictionUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ file_link: photoUrl })
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        reject(response.statusText);
-                    }
-                    resolve(response.json());
+        try{
+            return new Promise((resolve, reject) => {
+                fetch(this._predictionUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ file_link: photoUrl })
                 })
-                .catch(error => {
-                    reject(error);
-                });
-        });
+                    .then(response => {
+                        if (!response.ok) {
+                            reject(response.statusText);
+                        }
+                        resolve(response.json());
+                    })
+                    .catch(error => {
+                        reject(error);
+                    });
+            });
+        }
+        catch(error){
+            console.log(error);
+            throw{
+                status: 500,
+                error: "Failed to get prediction"
+            }
+        }
     }
 }
 

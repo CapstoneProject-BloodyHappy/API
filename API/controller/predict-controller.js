@@ -11,20 +11,20 @@ class PredictController {
     predict = async (req, res) => {
         try {
             const prediction = await this._predictService.predict(req, res);
-            res.json(prediction);
+            return res.json(prediction);
         } catch (error) {
-            console.error(error);
-            res.status(500).send('Internal Server Error');
+            console.error(error.log || error);
+            return res.status(error.status || 500).json(error.message || 'Internal Server Error');
         }
     }
 
     getPredictions = async (req, res) => {
         try {
             const predictions = await this._predictService.getPredictions(req, res);
-            res.json(predictions);
+            return res.json(predictions);
         } catch (error) {
-            console.error(error);
-            res.status(500).send('Internal Server Error');
+            console.error(error.log || error);
+            return res.status(error.status || 500).json(error.message || 'Internal Server Error');
         }
     }
 }

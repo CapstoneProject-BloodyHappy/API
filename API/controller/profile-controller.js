@@ -9,21 +9,27 @@ class ProfileController {
 
     createProfile = async (req, res) => {
         try {
+            const uid = await this._firebase.getUid();
+            const isUidExist = await this._firebase.isUidExist(uid);
+    
+            if (isUidExist) {
+                return res.status(403).json({ response: 'User Already Exist' });
+            }
             const profile = await this._profileService.createProfile(req, res);
-            res.json(profile);
+            return res.json(profile);
         } catch (error) {
             console.error(error);
-            res.status(500).send('Internal Server Error');
+            return res.status(error.status).json(error || 'Internal Server Error');
         }
     }
 
     getProfile = async (req, res) => {
         try {
             const profile = await this._profileService.getProfile(req, res);
-            res.json(profile);
+            return res.json(profile);
         } catch (error) {
             console.error(error);
-            res.status(500).send('Internal Server Error');
+            return res.status(500).send('Internal Server Error');
         }
     }
 }

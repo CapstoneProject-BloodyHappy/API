@@ -1,5 +1,7 @@
 
 const express = require('express');
+const socketIO = require('socket.io');
+const http = require('http');
 var multer = require('multer');
 require('dotenv').config();
 
@@ -9,9 +11,18 @@ const FireBase = require('./libs/firebase');
 
 const PredictController = require('./controller/predict-controller');
 const ProfileController = require('./controller/profile-controller');
+const MessageController = require('./controller/message-controller');
 
 const app = express();
 const port = 3000;
+const server = http.createServer(app);
+const io = socketIO(server, {
+    path: '/message-socket',
+    cors: {
+        origin: '*',
+        methods: ['GET', 'POST']
+    }
+});
 
 const cloudStorage = new CloudStorage('../gcp-service-account.json', process.env.BUCKET_NAME);
 const predictionAPI = new PredictionAPI(process.env.PREDICTION_API_URL);
@@ -25,16 +36,28 @@ app.use('/create-user', fireBase.authenticateNewFirebaseUser);
 
 const predictController = new PredictController(cloudStorage, predictionAPI, fireBase);
 const profileController = new ProfileController(fireBase, cloudStorage);
+const messageController = new MessageController(fireBase, io);
 
-app.post('/create-user', async (req, res) => {
+io.use((socket, next) => fireBase.authenticateFirebaseUserForSocket(socket, next));
+
+io.on('connection', (socket) => {
+    console.log(`Socket ${socket.id} connected`);
+
+    socket.on('requestConsultation', (req) => {
+        messageController.sendConsultationRequest(socket, req);
+    });
+
+    socket.on('message', (req) => {
+        messageController.sendMessage(socket, req);
+    });
+
+    socket.on('disconnect', () => {
+        console.log(`Socket ${socket.id} disconnected`);
+    });
+});
+
+app.post('/create-user', upload.single('file'), async (req, res) => {
     try {
-        const uid = await fireBase.getUid();
-        const isUidExist = await fireBase.isUidExist(uid);
-
-        if (isUidExist) {
-            res.status(403).json({ response: 'User Already Exist' });
-        }
-
         profileController.createProfile(req, res);
 
     } catch (error) {
@@ -61,6 +84,6 @@ app.post('/predict', upload.single('file'), async (req, res) => {
     }
 });
 
-app.listen(port, () => {
+server.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });

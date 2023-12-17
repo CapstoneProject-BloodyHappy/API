@@ -11,20 +11,29 @@ class cloudStorage {
     }
 
     uploadPhoto = async (file, folder) => {
-        return new Promise((resolve, reject) => {
-            const { originalname, buffer } = file;
-            const blob = this._bucket.file(`${folder}/${originalname.replace(/ /g, "_")}`);
-            const blobStream = blob.createWriteStream({
-                resumable: false
+        try{
+            return new Promise((resolve, reject) => {
+                const { originalname, buffer } = file;
+                const blob = this._bucket.file(`${folder}/${originalname.replace(/ /g, "_")}`);
+                const blobStream = blob.createWriteStream({
+                    resumable: false
+                });
+    
+                blobStream.on('finish', () => {
+                    const publicUrl = `https://storage.googleapis.com/${this._bucket.name}/${blob.name}`;
+                    resolve(publicUrl);
+                }).on('error', (err) => {
+                    reject(`Unable to upload image, something went wrong`);
+                }).end(buffer);
             });
-
-            blobStream.on('finish', () => {
-                const publicUrl = `https://storage.googleapis.com/${this._bucket.name}/${blob.name}`;
-                resolve(publicUrl);
-            }).on('error', (err) => {
-                reject(`Unable to upload image, something went wrong`);
-            }).end(buffer);
-        });
+        }
+        catch(error){
+            console.error(error);
+            throw {
+                status: 500,
+                error: "Failed to upload photo"
+            };
+        };
     }
 }
 

@@ -11,21 +11,25 @@ class PredictService {
     }
 
     predict = async (req, res) => {
-        let fileUrl = await this._cloudStorage.uploadPhoto(req.file, 'photo');
-        let predictResult = await this._predictionAPI.getPrediction(fileUrl);
-        let newPrediction = {
-            photoUrl: fileUrl,
-            uid: req.uid,
-            date: new Date().toISOString(),
-            result: predictResult.prediction,
-            recommendation: predictResult.prediction === 'Anemia' ? anemiaDesc : nonAnemiaDesc
+        try{
+            let fileUrl = await this._cloudStorage.uploadPhoto(req.file, 'photo');
+            let predictResult = await this._predictionAPI.getPrediction(fileUrl);
+            let newPrediction = {
+                photoUrl: fileUrl,
+                uid: req.uid,
+                date: new Date().toISOString(),
+                result: predictResult.prediction,
+                recommendation: predictResult.prediction === 'Anemia' ? anemiaDesc : nonAnemiaDesc
+            }
+            await this._firebase.savePrediction(newPrediction);
+            return newPrediction;
         }
-        await this._firebase.savePrediction(newPrediction);
-        return newPrediction;
+        catch(errpr){
+            throw error;
+        }
     }
 
     getPredictions = async (req, res) => {
-    
     }
 }
 
