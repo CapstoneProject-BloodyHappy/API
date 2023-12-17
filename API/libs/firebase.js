@@ -149,12 +149,12 @@ class FireBase {
         return snapshot.docs.length > 0;
     }
 
-    createConsultation = async (doctorUid, clientUid, predictionid) => {
+    createConsultation = async (doctorUid, clientUid, predictionId) => {
         try {
             const consultation = {
                 doctorUid,
                 clientUid,
-                predictionid
+                predictionId
             };
             await this._firestore.collection('consultations').add(consultation);
         }
