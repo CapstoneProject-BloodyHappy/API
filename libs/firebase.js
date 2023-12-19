@@ -27,6 +27,8 @@ class FireBase {
         try {
             const decodedToken = await this.getUid(idToken);
 
+            req.uid = decodedToken;
+
             next();
         } catch (error) {
             console.error(error);
@@ -39,6 +41,8 @@ class FireBase {
 
         try {
             const decodedToken = await this.getUid(idToken);
+
+            req.uid = decodedToken;
             
             const isUidExisted = await this.isUidExist(decodedToken);
             if (!isUidExisted) {
