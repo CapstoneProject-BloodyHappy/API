@@ -57,7 +57,7 @@ class FireBase {
     };
 
     authenticateFirebaseUserForSocket = async (socket, next) => {
-        const idToken = socket.request.headers['Authorization'];
+        const idToken = socket.handshake.headers['authorization'];
     
         try {
             const decodedToken = await this.getUid(idToken);
