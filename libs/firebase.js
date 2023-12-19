@@ -249,6 +249,20 @@ class FireBase {
             }
         }
     }
+
+    changeAppointmentStatus = async (params) => {
+        try {
+            await this._firestore.collection('consultations').doc(params.consultationid).update({ status: params.status });
+        }
+        catch (error) {
+            console.error(error);
+            throw {
+                status: 500,
+                message: 'Failed to change appointment status',
+                log: error
+            }
+        }
+    }
 }
 
 module.exports = FireBase;

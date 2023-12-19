@@ -37,6 +37,16 @@ class AppointmentController {
             return res.status(500).send('Internal Server Error');
         }
     }
+
+    async changeAppointmentStatus(req, res) {
+        try {
+            const appointments = await this._appointmentService.changeAppointmentStatus(req, res);
+            return res.json(appointments);
+        } catch (error) {
+            console.error(error);
+            return res.status(500).send('Internal Server Error');
+        }
+    }
 }
 
 module.exports = AppointmentController;

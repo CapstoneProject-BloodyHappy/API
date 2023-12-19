@@ -28,6 +28,16 @@ class AppointmentService {
             throw error;
         }
     }
+
+    async changeAppointmentStatus(req, res){
+        try{
+            const appointment = await this._firebase.changeAppointmentStatus(req.body);
+            return appointment;
+        }
+        catch(error){
+            throw error;
+        }
+    }
 }
 
 module.exports = AppointmentService;
