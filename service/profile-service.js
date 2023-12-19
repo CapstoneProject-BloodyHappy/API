@@ -6,7 +6,7 @@ class ProfileService {
 
     createProfile = async (req, res) => {
         try{
-            const uid = await this._firebase.getUid(req.header('Authorization'));
+            const uid = req.uid;
             console.log(req.body)
             const { name, email, age, sex } = req.body;
             if (!name || !email || !age || !sex){
@@ -32,7 +32,7 @@ class ProfileService {
 
     editProfile = async (req, res) => {
         try{
-            const uid = await this._firebase.getUid(req.header('Authorization'));
+            const uid = req.uid;
             const { name, email, age, sex } = req.body;
             if (!req.body) {
                 throw {
@@ -49,8 +49,7 @@ class ProfileService {
     }
 
     getProfile = async (req, res) => {
-        const uid = await this._firebase.getUid(req.header('Authorization'));
-        return await this._firebase.getUser(uid);
+        return await this._firebase.getUser(req.uid);
     }
 }
 

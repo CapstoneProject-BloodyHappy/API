@@ -9,8 +9,7 @@ class ProfileController {
 
     createProfile = async (req, res) => {
         try {
-            const uid = await this._firebase.getUid(req.header('Authorization'));
-            const isUidExist = await this._firebase.isUidExist(uid);
+            const isUidExist = await this._firebase.isUidExist(req.uid);
     
             if (isUidExist) {
                 return res.status(403).json({ response: 'User Already Exist' });

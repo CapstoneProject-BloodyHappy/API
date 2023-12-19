@@ -24,7 +24,7 @@ class PredictService {
             await this._firebase.savePrediction(newPrediction);
             return newPrediction;
         }
-        catch(errpr){
+        catch(error){
             throw error;
         }
     }
