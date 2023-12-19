@@ -109,8 +109,10 @@ class FireBase {
 
     getPrediction = async (id) => {
         const snapshot = await this._firestore.collection('predictions').doc(id).get();
+        const user = await this._firestore.collection('users').where('uid', '==', snapshot.data().uid).get();
         const data = snapshot.data();
-        return { id: snapshot.id, ...data };
+        data.user = user.docs[0].data();
+        return { id: snapshot.id, ...data, ...data.user };
     }
 
     getPredictionsByUid = async (uid) => {
