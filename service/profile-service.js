@@ -52,6 +52,10 @@ class ProfileService {
     getProfile = async (req, res) => {
         return await this._firebase.getUser(req.uid);
     }
+
+    getDoctors = async (req, res) => {
+        return await this._firebase.getDoctors();
+    }
 }
 
 module.exports = ProfileService;

@@ -133,6 +133,12 @@ class FireBase {
         return snapshot.docs[0].data();
     }
 
+    getDoctors = async () => {
+        const snapshot = await this._firestore.collection('users').where('role', '==', 'doctor').get();
+        return snapshot.docs.map(doc => doc.data());
+    
+    }
+
     createUser = async (user) => {
         try {
             await this._firestore.collection('users').add(user);
