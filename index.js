@@ -114,6 +114,16 @@ app.get('/predict/:id', async (req, res) => {
     }
 });
 
+app.get('/chatsByPredictionID/:id', async (req, res) => {
+    try {
+        messageController.getChatsByPredictionId(req, res);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+
 server.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });

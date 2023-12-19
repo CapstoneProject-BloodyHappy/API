@@ -1,14 +1,16 @@
 class MessageService {
-    constructor() {
-        this.messages = [];
+    constructor(firebase, io) {
+        this._firebase = firebase;
+        this._io = io;
     }
 
-    add(message) {
-        this.messages.push(message);
-    }
-
-    get() {
-        return this.messages;
+    async getChatsByPredictionId(req, res) {
+        try {
+            const chats = await this._firebase.getChatsByPredictionId(req.params.id);
+            return chats;
+        } catch (error) {
+            throw error;
+        }
     }
 }
 

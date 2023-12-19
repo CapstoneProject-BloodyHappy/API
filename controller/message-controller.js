@@ -4,7 +4,7 @@ class MessageController {
     constructor(firebase, io) {
         this._firebase = firebase;
         this._io = io;
-        this._messageService = new MessageService();
+        this._messageService = new MessageService(firebase, io);
     }
 
     async sendConsultationRequest(socket, req) {
@@ -24,9 +24,20 @@ class MessageController {
         try {
             if (this._firebase.isConsultationExist(req.uid, req.recipient.uid) || this._firebase.isConsultationExist(req.recipient.uid, req.uid)) {
                 this._io.to(req.recipient.socketid).emit('message', { sender: {socketid: socket.id, uid: req.uid}, message: req.message });
+                await this._firebase.saveMessage({senderUid: req.uid, predictionId: req.predictionid, message: req.message, timestamp: new Date().toISOString()});
             }
         } catch (error) {
             console.error(error);
+        }
+    }
+
+    async getChatsByPredictionId(req, res) {
+        try {
+            const chats = await this._messageService.getChatsByPredictionId(req, res);
+            return res.json(chats);
+        } catch (error) {
+            console.error(error);
+            return res.status(500).send('Internal Server Error');
         }
     }
 }

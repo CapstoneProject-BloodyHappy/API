@@ -174,6 +174,35 @@ class FireBase {
             }
         }
     }
+
+    getChatsByPredictionId = async (predictionId) => {
+        try {
+            const snapshot = await this._firestore.collection('chats').where('predictionId', '==', predictionId).get();
+            return snapshot.docs.map(doc => doc.data());
+        }
+        catch (error) {
+            console.error(error);
+            throw {
+                status: 500,
+                message: 'Failed to get chats',
+                log: error
+            }
+        }
+    }
+
+    saveMessage = async (message) => {
+        try {
+            await this._firestore.collection('chats').add(message);
+        }
+        catch (error) {
+            console.error(error);
+            throw {
+                status: 500,
+                message: 'Failed to save chat',
+                log: error
+            }
+        }
+    }
 }
 
 module.exports = FireBase;
