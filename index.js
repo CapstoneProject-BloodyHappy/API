@@ -2,6 +2,7 @@
 const express = require('express');
 const socketIO = require('socket.io');
 const http = require('http');
+const cors = require('cors');
 var multer = require('multer');
 require('dotenv').config();
 
@@ -14,7 +15,7 @@ const ProfileController = require('./controller/profile-controller');
 const MessageController = require('./controller/message-controller');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 8080;
 const server = http.createServer(app);
 const io = socketIO(server, {
     path: '/message-socket',
@@ -31,8 +32,10 @@ const fireBase = new FireBase();
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+app.use(cors());
 app.use(['/profile', '/predict'], fireBase.authenticateFirebaseUser);
 app.use('/create-user', fireBase.authenticateNewFirebaseUser);
+app.use(express.json());
 
 const predictController = new PredictController(cloudStorage, predictionAPI, fireBase);
 const profileController = new ProfileController(fireBase, cloudStorage);
@@ -56,7 +59,7 @@ io.on('connection', (socket) => {
     });
 });
 
-app.post('/create-user', upload.single('file'), async (req, res) => {
+app.post('/create-user', async (req, res) => {
     try {
         profileController.createProfile(req, res);
 
@@ -69,6 +72,15 @@ app.post('/create-user', upload.single('file'), async (req, res) => {
 app.get('/profile', async (req, res) => {
     try {
         profileController.getProfile(req, res);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+app.put('/profile', async (req, res) => {
+    try {
+        profileController.editProfile(req, res);
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');

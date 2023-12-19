@@ -9,13 +9,23 @@ class ProfileController {
 
     createProfile = async (req, res) => {
         try {
-            const uid = await this._firebase.getUid();
+            const uid = await this._firebase.getUid(req.header('Authorization'));
             const isUidExist = await this._firebase.isUidExist(uid);
     
             if (isUidExist) {
                 return res.status(403).json({ response: 'User Already Exist' });
             }
             const profile = await this._profileService.createProfile(req, res);
+            return res.json(profile);
+        } catch (error) {
+            console.error(error);
+            return res.status(error.status).json(error || 'Internal Server Error');
+        }
+    }
+
+    editProfile = async (req, res) => {
+        try {    
+            const profile = await this._profileService.editProfile(req, res);
             return res.json(profile);
         } catch (error) {
             console.error(error);

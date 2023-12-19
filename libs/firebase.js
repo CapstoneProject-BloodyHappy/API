@@ -18,40 +18,37 @@ class FireBase {
     }
 
     getUid = async (idToken) => {
-        // const decodedToken = await admin.auth().verifyIdToken(idToken);  // Prod
-        // return decodedToken.uid;                                         // Prod
-        return 'Q1ShNyf7bJcfKLp8d2yf25jqucH3';                              // Test
+        const decodedToken = await admin.auth().verifyIdToken(idToken);  // Prod
+        return decodedToken.uid;                                         // Prod
     }
 
     authenticateNewFirebaseUser = async (req, res, next) => {
         const idToken = req.header('Authorization');
-
         try {
             const decodedToken = await this.getUid(idToken);
 
             next();
         } catch (error) {
             console.error(error);
-            res.status(401).json({ error: 'Unauthorized' });
+            return res.status(401).json({ error: 'Unauthorized' });
         }
     };
 
     authenticateFirebaseUser = async (req, res, next) => {
         const idToken = req.header('Authorization');
-    
+
         try {
             const decodedToken = await this.getUid(idToken);
-
-            const isUidExist = await this.isUidExist(decodedToken);
-
-            if (!isUidExist) {
-                res.status(403).json({ response: 'New User Login, Initialize User First' });
+            
+            const isUidExisted = await this.isUidExist(decodedToken);
+            if (!isUidExisted) {
+                return res.status(403).json({ response: 'New User Login, Initialize User First' });
             }
 
             next();
         } catch (error) {
             console.error(error);
-            res.status(401).json({ error: 'Unauthorized' });
+            return res.status(401).json({ error: 'Unauthorized' });
         }
     };
 
@@ -142,6 +139,12 @@ class FireBase {
                 log: error
             }
         }
+    }
+
+    editProfile = async (uid, profile) => {
+        const snapshot = await this._firestore.collection('users').where('uid', '==', uid).get();
+        const docId = snapshot.docs[0].id;
+        await this._firestore.collection('users').doc(docId).update(profile);
     }
 
     isConsultationExist = async (clientUid, doctorUid) => {
