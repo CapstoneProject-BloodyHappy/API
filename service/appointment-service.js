@@ -12,6 +12,22 @@ class AppointmentService {
             throw error;
         }
     }
+
+    async makeAppointment(req, res){
+        try{
+            const params = {
+                clientUid : req.uid,
+                doctorUid : req.body.doctorUid,
+                predictionid : req.body.predictionid,
+                status : 'pending'
+            }
+            const appointment = await this._firebase.makeAppointment(params);
+            return appointment;
+        }
+        catch(error){
+            throw error;
+        }
+    }
 }
 
 module.exports = AppointmentService;

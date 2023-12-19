@@ -235,6 +235,20 @@ class FireBase {
 
         return appointments;
     }
+
+    makeAppointment = async (appointment) => {
+        try {
+            await this._firestore.collection('consultations').add(appointment);
+        }
+        catch (error) {
+            console.error(error);
+            throw {
+                status: 500,
+                message: 'Failed to make appointment',
+                log: error
+            }
+        }
+    }
 }
 
 module.exports = FireBase;

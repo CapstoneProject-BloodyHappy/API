@@ -143,6 +143,14 @@ app.get('/appointments', async (req, res) => {
     }
 });
 
+app.post('/appointments', async (req, res) => {
+    try {
+        appointmentController.makeAppointment(req, res);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
 
 server.listen(port, () => {
     console.log(`Server is running on port ${port}`);
