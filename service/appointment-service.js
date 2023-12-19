@@ -5,8 +5,16 @@ class AppointmentService {
 
     async getAppointments(req, res){
         try{
-            const doctors = await this._firebase.getAppointments(req.uid);
-            return doctors;
+            const role = await this._firebase.getUser(req.uid);
+
+            if (role.role === 'doctor'){
+                const appointments = await this._firebase.getAppointments(req.uid);
+                return appointments;
+            }
+            else{
+                const appointments = await this._firebase.getUserAppointments(req.uid);
+                return appointments;
+            }
         }
         catch(error){
             throw error;

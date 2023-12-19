@@ -240,6 +240,34 @@ class FireBase {
         return appointments;
     }
 
+    getUserAppointments = async (uid) => {
+        const snapshot = await this._firestore.collection('consultations').where('clientUid', '==', uid).get();
+        const appointments = [];
+    
+        const fetchUserPromises = snapshot.docs.map(async (doc) => {
+            const appointmentData = doc.data();
+
+            const doctorUid = appointmentData.doctorUid;
+
+            const userSnapshot = await this._firestore.collection('users').where('uid', '==', doctorUid).get();
+            const userData = userSnapshot ? userSnapshot.docs[0].data() : null;
+
+            const mergedData = {
+                appointment: {
+                    id: doc.id,
+                    ...appointmentData
+                },
+                doctor: userData
+            };
+
+            appointments.push(mergedData);
+        });
+
+        await Promise.all(fetchUserPromises);
+
+        return appointments;
+    }
+
     makeAppointment = async (appointment) => {
         try {
             await this._firestore.collection('consultations').add(appointment);
