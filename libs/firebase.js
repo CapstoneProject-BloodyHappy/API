@@ -218,13 +218,17 @@ class FireBase {
     
         const fetchUserPromises = snapshot.docs.map(async (doc) => {
             const appointmentData = doc.data();
+
             const clientUid = appointmentData.clientUid;
 
             const userSnapshot = await this._firestore.collection('users').where('uid', '==', clientUid).get();
             const userData = userSnapshot ? userSnapshot.docs[0].data() : null;
 
             const mergedData = {
-                appointment: appointmentData,
+                appointment: {
+                    id: doc.id,
+                    ...appointmentData
+                },
                 user: userData
             };
 
