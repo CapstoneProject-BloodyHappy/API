@@ -30,6 +30,13 @@ class PredictService {
     }
 
     getPredictions = async (req, res) => {
+        try{
+            let predictions = await this._firebase.getPredictionsByUid(req.uid);
+            return predictions;
+        }
+        catch(error){
+            throw error;
+        }
     }
 }
 

@@ -96,6 +96,15 @@ app.post('/predict', upload.single('file'), async (req, res) => {
     }
 });
 
+app.get('/predictionsByUID', async (req, res) => {
+    try {
+        predictController.getPredictions(req, res);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
 server.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
