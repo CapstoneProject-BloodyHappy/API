@@ -211,6 +211,30 @@ class FireBase {
             }
         }
     }
+
+    getAppointments = async (uid) => {
+        const snapshot = await this._firestore.collection('consultations').where('doctorUid', '==', uid).get();
+        const appointments = [];
+    
+        const fetchUserPromises = snapshot.docs.map(async (doc) => {
+            const appointmentData = doc.data();
+            const clientUid = appointmentData.clientUid;
+
+            const userSnapshot = await this._firestore.collection('users').where('uid', '==', clientUid).get();
+            const userData = userSnapshot ? userSnapshot.docs[0].data() : null;
+
+            const mergedData = {
+                appointment: appointmentData,
+                user: userData
+            };
+
+            appointments.push(mergedData);
+        });
+
+        await Promise.all(fetchUserPromises);
+
+        return appointments;
+    }
 }
 
 module.exports = FireBase;

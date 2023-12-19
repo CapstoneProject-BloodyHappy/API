@@ -34,14 +34,14 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 app.use(cors());
-app.use(['/profile', '/predict', '/predictionsByUID', '/doctors'], fireBase.authenticateFirebaseUser);
+app.use(['/profile', '/predict', '/predictionsByUID', '/doctors', '/appointments'], fireBase.authenticateFirebaseUser);
 app.use('/create-user', fireBase.authenticateNewFirebaseUser);
 app.use(express.json());
 
 const predictController = new PredictController(cloudStorage, predictionAPI, fireBase);
 const profileController = new ProfileController(fireBase, cloudStorage);
 const messageController = new MessageController(fireBase, io);
-const appointmentController = new AppointmentController(fireBase, cloudStorage);
+const appointmentController = new AppointmentController(fireBase);
 
 io.use((socket, next) => fireBase.authenticateFirebaseUserForSocket(socket, next));
 
@@ -128,6 +128,15 @@ app.get('/chatsByPredictionID/:id', async (req, res) => {
 app.get('/doctors', async (req, res) => {
     try {
         appointmentController.getDoctors(req, res);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+app.get('/appointments', async (req, res) => {
+    try {
+        appointmentController.getAppointments(req, res);
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
