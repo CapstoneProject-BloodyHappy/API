@@ -80,6 +80,7 @@ class FireBase {
         try {
             const docRef = this._firestore.collection('predictions').doc();
             await docRef.set(prediction);
+            return docRef.id;
         }
         catch (error) {
             console.error(error);
@@ -108,7 +109,8 @@ class FireBase {
 
     getPrediction = async (id) => {
         const snapshot = await this._firestore.collection('predictions').doc(id).get();
-        return snapshot.data();
+        const data = snapshot.data();
+        return { id: snapshot.id, ...data };
     }
 
     getPredictionsByUid = async (uid) => {

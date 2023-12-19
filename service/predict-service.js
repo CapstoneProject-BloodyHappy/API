@@ -21,8 +21,8 @@ class PredictService {
                 result: predictResult.prediction,
                 recommendation: predictResult.prediction === 'Anemia' ? anemiaDesc : nonAnemiaDesc
             }
-            await this._firebase.savePrediction(newPrediction);
-            return newPrediction;
+            const id = await this._firebase.savePrediction(newPrediction);
+            return { id, ...newPrediction };
         }
         catch(error){
             throw error;
