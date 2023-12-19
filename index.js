@@ -33,7 +33,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 app.use(cors());
-app.use(['/profile', '/predict'], fireBase.authenticateFirebaseUser);
+app.use(['/profile', '/predict', '/predictionsByUID'], fireBase.authenticateFirebaseUser);
 app.use('/create-user', fireBase.authenticateNewFirebaseUser);
 app.use(express.json());
 
