@@ -23,7 +23,8 @@ class MessageController {
     async sendMessage(socket, req) {
         try {
             if (this._firebase.isConsultationExist(req.uid, req.recipient.uid) || this._firebase.isConsultationExist(req.recipient.uid, req.uid)) {
-                this._io.to(req.recipient.socketid).emit('message', { sender: {socketid: socket.id, uid: req.uid}, message: req.message });
+                // this._io.to(req.recipient.socketid).emit('message', { sender: {socketid: socket.id, uid: req.uid}, message: req.message });
+                this._io.emit('updateMessage', { predictionid: req.predictionid });
                 await this._firebase.saveMessage({senderUid: req.uid, predictionId: req.predictionid, message: req.message, timestamp: new Date().toISOString()});
             }
         } catch (error) {
