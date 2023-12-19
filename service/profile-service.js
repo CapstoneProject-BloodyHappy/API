@@ -20,7 +20,8 @@ class ProfileService {
                 email,
                 age,
                 sex,
-                uid
+                uid,
+                role: 'user'
             };
             await this._firebase.createUser(profile);
             return profile;

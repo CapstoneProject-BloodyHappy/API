@@ -10,11 +10,20 @@ class cloudStorage {
         this._bucket = this._storage.bucket(this._bucketName);
     }
 
+    generateRandomName = () => {
+        const timestamp = new Date().getTime();
+        const randomString = Math.random().toString(36).substring(2, 8);
+
+        const randomName = `photo_${timestamp}_${randomString}`;
+        return randomName;
+    }
+
+
     uploadPhoto = async (file, folder) => {
         try{
             return new Promise((resolve, reject) => {
-                const { originalname, buffer } = file;
-                const blob = this._bucket.file(`${folder}/${originalname.replace(/ /g, "_")}`);
+                const { buffer } = file;
+                const blob = this._bucket.file(`${folder}/${this.generateRandomName().replace(/ /g, "_")}`);
                 const blobStream = blob.createWriteStream({
                     resumable: false
                 });
