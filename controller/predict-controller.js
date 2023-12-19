@@ -27,6 +27,16 @@ class PredictController {
             return res.status(error.status || 500).json(error.message || 'Internal Server Error');
         }
     }
+
+    getPredictionDetails = async (req, res) => {
+        try {
+            const prediction = await this._predictService.getPredictionDetails(req, res);
+            return res.json(prediction);
+        } catch (error) {
+            console.error(error.log || error);
+            return res.status(error.status || 500).json(error.message || 'Internal Server Error');
+        }
+    }
 }
 
 module.exports = PredictController;

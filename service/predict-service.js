@@ -38,6 +38,17 @@ class PredictService {
             throw error;
         }
     }
+
+    getPredictionDetails = async (req, res) => {
+        try{
+            let prediction = await this._firebase.getPrediction(req.params.id);
+            console.log(prediction);
+            return prediction;
+        }
+        catch(error){
+            throw error;
+        }
+    }
 }
 
 module.exports = PredictService;
