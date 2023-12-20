@@ -1,15 +1,23 @@
 var admin = require("firebase-admin");
 const { Firestore } = require('@google-cloud/firestore');
+require('dotenv').config();
+
 
 class FireBase {
     constructor() {
-        this._serviceAccount = require("../firebase-adminsdk.json");
+        const firebaseConfig = {
+            projectId: process.env.project_id,
+            client_email: process.env.client_email_firebase,
+            private_key: process.env.private_key_firebase.replace(/\\n/g, '\n'),
+            credentials: {
+                client_email: process.env.client_email_firebase,
+                private_key: process.env.private_key_firebase.replace(/\\n/g, '\n'),
+            },
+        };
         admin.initializeApp({
-            credential: admin.credential.cert(this._serviceAccount),
+            credential: admin.credential.cert(firebaseConfig),
         });
-
-        let keyFilename = 'firebase-adminsdk.json'
-        this._firestore = new Firestore({ keyFilename });
+        this._firestore = new Firestore(firebaseConfig)
     }
 
     isUidExist = async (uid) => {

@@ -4,7 +4,13 @@ const path = require('path');
 class cloudStorage {
     constructor(keyPath, bucketName) {
         const keyFilename = path.join(__dirname, keyPath);
-        this._storage = new Storage({ keyFilename });
+        this._storage = new Storage({
+            projectId: process.env.project_id,
+            credentials: {
+                client_email: process.env.client_email_service_account,
+                private_key: process.env.private_key_service_account.replace(/\\n/g, '\n'),
+            },
+        });
         this._bucketName = bucketName;
 
         this._bucket = this._storage.bucket(this._bucketName);
