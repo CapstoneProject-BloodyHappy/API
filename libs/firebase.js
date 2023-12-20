@@ -124,7 +124,7 @@ class FireBase {
     }
 
     getPredictionsByUid = async (uid) => {
-        const snapshot = await this._firestore.collection('predictions').where('uid', '==', uid).get();
+        const snapshot = await this._firestore.collection('predictions').where('uid', '==', uid).orderBy('date', 'desc').get();
         return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     }
 
@@ -223,7 +223,7 @@ class FireBase {
     }
 
     getAppointments = async (uid) => {
-        const snapshot = await this._firestore.collection('consultations').where('doctorUid', '==', uid).get();
+        const snapshot = await this._firestore.collection('consultations').where('clientUid', '==', uid).orderBy("clientUid", "asc").get();
         const appointments = [];
     
         const fetchUserPromises = snapshot.docs.map(async (doc) => {
@@ -251,7 +251,7 @@ class FireBase {
     }
 
     getUserAppointments = async (uid) => {
-        const snapshot = await this._firestore.collection('consultations').where('clientUid', '==', uid).get();
+        const snapshot = await this._firestore.collection('consultations').where('doctorUid', '==', uid).orderBy("clientUid", "asc").get();
         const appointments = [];
     
         const fetchUserPromises = snapshot.docs.map(async (doc) => {
